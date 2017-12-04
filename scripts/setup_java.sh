@@ -23,16 +23,14 @@
 # get the MOS Credentials
 MOS_USER="${1#*=}"
 MOS_PASSWORD="${2#*=}"
+MOS_JAVA_URL="${3#*=}"
 
 # Download and Package Variables
-# JAVA 1.8u144
-export JAVA_URL="https://updates.oracle.com/Orion/Services/download/p26512979_180144_Linux-x86-64.zip?aru=21443434&patch_file=p26512979_180144_Linux-x86-64.zip"
-export JAVA_PKG="p26512979_180144_Linux-x86-64.zip"
+# JAVA 1.8u152 https://updates.oracle.com/ARULink/PatchDetails/process_form?patch_num=2659589
+export JAVA_URL="https://updates.oracle.com/Orion/Services/download/p26595894_180152_Linux-x86-64.zip?aru=21611278&patch_file=p26595894_180152_Linux-x86-64.zip"
+export JAVA_PKG=${JAVA_URL#*patch_file=}
 
 # define environment variables
-export ORACLE_ROOT=/u00             # oracle root directory
-export ORACLE_DATA=/u01             # oracle data directory
-export ORACLE_BASE=/u00/app/oracle  # oracle base directory
 export JAVA_DIR=/usr/java           # java home location
 export DOWNLOAD=/tmp/download       # temporary download directory
 mkdir -p $DOWNLOAD
@@ -56,56 +54,12 @@ then
     >&2 echo "================================================================================="
 fi
 
-echo "--- Setup Oracle OFA environment -----------------------------------------------"
-echo "--- Create groups for Oracle software"
-# create oracle groups
-groupadd --gid 1000 oinstall
-groupadd --gid 1010 osdba
-groupadd --gid 1020 osoper
-groupadd --gid 1030 osbackupdba
-groupadd --gid 1040 oskmdba
-groupadd --gid 1050 osdgdba
-
-echo "--- Create user oracle"
-# create oracle user
-useradd --create-home --gid oinstall --shell /bin/bash \
-    --groups oinstall,osdba,osoper,osbackupdba,osdgdba,oskmdba \
-    oracle
-
-echo "--- Create OFA directory structure"
-# create oracle directories
-mkdir -p $ORACLE_ROOT
-mkdir -p $ORACLE_DATA
-mkdir -p $ORACLE_BASE
-mkdir -p $ORACLE_BASE/etc
-mkdir -p $ORACLE_BASE/local
-mkdir -p $ORACLE_BASE/product
-
-echo "--- Create response and inventory loc files"
-# create an oraInst.loc file
-echo "inventory_loc=$ORACLE_BASE/oraInventory" > $ORACLE_BASE/etc/oraInst.loc
-echo "inst_group=oinstall" >> $ORACLE_BASE/etc/oraInst.loc
-
-# create a generic response file for OUD/WLS
-echo "[ENGINE]" > $ORACLE_BASE/etc/install.rsp
-echo "Response File Version=1.0.0.0.0" >> $ORACLE_BASE/etc/install.rsp
-echo "[GENERIC]" >> $ORACLE_BASE/etc/install.rsp
-echo "DECLINE_SECURITY_UPDATES=true" $ORACLE_BASE/etc/install.rsp
-echo "SECURITY_UPDATES_VIA_MYORACLESUPPORT=false" >> $ORACLE_BASE/etc/install.rsp
-
-# change permissions and ownership
-chmod a+xr $ORACLE_ROOT $ORACLE_DATA
-chown oracle:oinstall -R $ORACLE_ROOT $ORACLE_DATA
-
 echo "--- Upgrade OS and install additional Packages ---------------------------------"
 # update existing packages
 yum upgrade -y
 
 # install basic packages util-linux, libaio 
-yum install -y libaio util-linux hostname which unzip zip tar sudo
-
-# add oracle to the sudoers
-echo "oracle  ALL=(ALL)   NOPASSWD: ALL" >>/etc/sudoers
+yum install -y unzip gzip tar
 
 # Download Server JRE 8u144 package if it does not exist /tmp/download
 if [ ! -e $DOWNLOAD/$JAVA_PKG ]
@@ -118,16 +72,18 @@ else
     echo "--- Use local copy of $DOWNLOAD/$JAVA_PKG --------------------------------------"
 fi
 
-echo "--- Install Server JRE 8u144 ---------------------------------------------------"
+echo "--- Install Server JRE 8 Update ---------------------------------------------------"
 # create java default folder
 mkdir -p $JAVA_DIR
 
 # unzip and untar Server JRE
 if [[ $DOWNLOAD/$JAVA_PKG =~ \.zip$ ]]
 then
-    unzip -p $DOWNLOAD/$JAVA_PKG *tar* |tar zx -C $JAVA_DIR
+    ls -al $DOWNLOAD/$JAVA_PKG
+    unzip -p $DOWNLOAD/$JAVA_PKG *tar* |tar zvx -C $JAVA_DIR
 else
-    tar zxf $DOWNLOAD/$JAVA_PKG -C $JAVA_DIR
+    ls -al $DOWNLOAD/$JAVA_PKG
+    tar zxvf $DOWNLOAD/$JAVA_PKG -C $JAVA_DIR
 fi
 
 # set the JAVA alternatives directories and links
