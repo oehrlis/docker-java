@@ -31,13 +31,20 @@ MAINTAINER Stefan Oehrli <stefan.oehrli@trivadis.com>
 ARG MOS_USER
 ARG MOS_PASSWORD
 
+# Environment variables required for this build (do NOT change)
+# -------------------------------------------------------------
+ENV DOWNLOAD=/tmp/download \
+    DOCKER_SCRIPTS=/opt/docker/bin \
+    ORACLE_ROOT=/u00 \
+    ORACLE_DATA=/u01
+
 # copy all scripts to DOCKER_BIN
-ADD scripts /opt/docker/bin/
-ADD software /tmp/download
+ADD scripts $DOCKER_SCRIPTS
+ADD software $DOWNLOAD
 
 # image setup via shell script to reduce layers and optimize final disk usage
-RUN /opt/docker/bin/setup_java.sh MOS_USER=$MOS_USER MOS_PASSWORD=$MOS_PASSWORD
+RUN $DOCKER_SCRIPTS/setup_java.sh MOS_USER=$MOS_USER MOS_PASSWORD=$MOS_PASSWORD
 
 # Oracle data volume for OUD instance and configuration files
-VOLUME ["/u01"]
+VOLUME ["$ORACLE_DATA"]
 CMD ["bash"]

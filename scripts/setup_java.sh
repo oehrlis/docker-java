@@ -16,8 +16,7 @@
 # Modified...: 
 # see git revision history for more information on changes/updates
 # TODO.......: 
-# TODO Check for /opt/docker/bin/.netrc file and provide alterantive
-# TODO parametize MOS credentials
+# TODO Provide JAVA download URL as parameter
 # ----------------------------------------------------------------------
 
 # get the MOS Credentials
@@ -32,7 +31,6 @@ export JAVA_PKG=${JAVA_URL#*patch_file=}
 
 # define environment variables
 export JAVA_DIR=/usr/java           # java home location
-export DOWNLOAD=/tmp/download       # temporary download directory
 mkdir -p $DOWNLOAD
 chmod 777 $DOWNLOAD
 
@@ -65,14 +63,14 @@ yum install -y unzip gzip tar
 if [ ! -e $DOWNLOAD/$JAVA_PKG ]
 then
     
-    echo "--- Download Server JRE 8u144 from MOS -----------------------------------------"
+    echo "--- Download Server JRE 8u152 from MOS -----------------------------------------"
     curl --netrc-file /opt/docker/bin/.netrc --cookie-jar cookie-jar.txt \
     --location-trusted $JAVA_URL -o $DOWNLOAD/$JAVA_PKG
 else
     echo "--- Use local copy of $DOWNLOAD/$JAVA_PKG --------------------------------------"
 fi
 
-echo "--- Install Server JRE 8 Update ---------------------------------------------------"
+echo "--- Install Server JRE 8 Update ------------------------------------------------"
 # create java default folder
 mkdir -p $JAVA_DIR
 
@@ -98,6 +96,6 @@ alternatives --install /usr/bin/jar jar $JAVA_DIR/bin/jar 20000
 echo "--- Clean up yum cache and temporary download files ----------------------------"
 yum clean all
 rm -rf /var/cache/yum
-rm -rf $DOWNLOAD
-rm /opt/docker/bin/.netrc
+rm -rf ${DOWNLOAD}/*
+rm ${DOCKER_SCRIPTS}/.netrc
 echo "=== Done runing $0 ==================================="

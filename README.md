@@ -26,7 +26,7 @@ Environment variable | Value / Directories         | Comment
 DOWNLOAD             | ```/tmp/download```         | Temporary download directory, will be removed after build
 DOCKER_BIN           | ```/opt/docker/bin```       | Docker build and setup scripts
 JAVA_DIR             | ```/usr/java```             | Base directory for java home location
-JAVA_HOME            | ```$JAVA_DIR/jdk1.8.0_144```| Java home directory
+JAVA_HOME            | ```$JAVA_DIR/jdk1.8.0_152```| Java home directory
 
 ## Installation and Build
 The docker image has to be build manually based on [oehrlis/docker-java](https://github.com/oehrlis/docker-java) from GitHub. Due to license restrictions from Oracle I can not provide this image on a public Docker repository (see [OTN Developer License Terms](http://www.oracle.com/technetwork/licenses/standard-license-152015.html)). The required Software has to be downloaded prior image build. Alternatively it is possible to specify MOS credentials in ```scripts/.netrc``` or via build arguments.
