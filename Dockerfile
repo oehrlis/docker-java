@@ -4,8 +4,8 @@
 # ----------------------------------------------------------------------
 # Name.......: Dockerfile 
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
-# Editor.....: 
-# Date.......: 04.12.2017
+# Editor.....: Stefan Oehrli
+# Date.......: 2017.12.04
 # Revision...: 1.0
 # Purpose....: Dockerfile to build java image
 # Notes......: --
@@ -32,19 +32,16 @@ ARG MOS_USER
 ARG MOS_PASSWORD
 
 # Environment variables required for this build (do NOT change)
-# -------------------------------------------------------------
+# ----------------------------------------------------------------------
 ENV DOWNLOAD=/tmp/download \
-    DOCKER_SCRIPTS=/opt/docker/bin \
-    ORACLE_ROOT=/u00 \
-    ORACLE_DATA=/u01
-
+    DOCKER_SCRIPTS=/opt/docker/bin
+    
 # copy all scripts to DOCKER_BIN
-ADD scripts $DOCKER_SCRIPTS
-ADD software $DOWNLOAD
+COPY scripts ${DOCKER_SCRIPTS}
+COPY software ${DOWNLOAD}
 
 # image setup via shell script to reduce layers and optimize final disk usage
-RUN $DOCKER_SCRIPTS/setup_java.sh MOS_USER=$MOS_USER MOS_PASSWORD=$MOS_PASSWORD
+RUN ${DOCKER_SCRIPTS}/setup_java.sh MOS_USER=${MOS_USER} MOS_PASSWORD=${MOS_PASSWORD}
 
-# Oracle data volume for OUD instance and configuration files
-VOLUME ["$ORACLE_DATA"]
 CMD ["bash"]
+# --- EOF --------------------------------------------------------------
