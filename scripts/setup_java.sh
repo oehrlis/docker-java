@@ -50,6 +50,9 @@ then
 fi
 
 echo "--- Upgrade OS and install additional Packages ---------------------------------"
+# limit locale to the different english languages
+echo "%_install_langs   en" >/etc/rpm/macros.lang
+
 # update existing packages
 yum upgrade -y
 
