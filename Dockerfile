@@ -30,6 +30,7 @@ MAINTAINER Stefan Oehrli <stefan.oehrli@trivadis.com>
 # Arguments for MOS Download
 ARG MOS_USER
 ARG MOS_PASSWORD
+ARG LOCALHOST
 
 # Environment variables required for this build (do NOT change)
 # ----------------------------------------------------------------------
@@ -41,7 +42,7 @@ COPY scripts ${DOCKER_SCRIPTS}
 COPY software ${DOWNLOAD}
 
 # image setup via shell script to reduce layers and optimize final disk usage
-RUN ${DOCKER_SCRIPTS}/setup_java.sh MOS_USER=${MOS_USER} MOS_PASSWORD=${MOS_PASSWORD}
+RUN ${DOCKER_SCRIPTS}/setup_java.sh MOS_USER=${MOS_USER} MOS_PASSWORD=${MOS_PASSWORD} LOCALHOST=${LOCALHOST}
 
 CMD ["bash"]
 # --- EOF --------------------------------------------------------------
